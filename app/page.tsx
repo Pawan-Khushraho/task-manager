@@ -32,7 +32,11 @@ export default function Home() {
     const handleRoleChange = (e) => setRoleFilter(e.target.value);
 
     return (
-        <main className="bg-[#212121] rounded-[1rem] w-full h-full transition-all p-4 sm:p-8 overflow-y-scroll">
+        <main className="bg-[#212121] rounded-[1rem] w-full h-full transition-all p-4 sm:p-8
+  [&::-webkit-scrollbar]:w-1
+  [&::-webkit-scrollbar-track]:bg-[#1E1E1E]
+  [&::-webkit-scrollbar-thumb]:bg-[#121212]
+   overflow-y-scroll">
             {/* Search and Filter Controls */}
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
                 <input
