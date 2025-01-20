@@ -18,7 +18,7 @@ interface Props {
 function TaskItem({ title, description, date, completed, id,prioties }: Props) {
     const params = useParams();
     // @ts-ignore
-    const { theme, deleteTask, updateTask } = useGlobalState();
+    const { theme, deleteTask, updateTask ,openEditModal} = useGlobalState();
     return (
         <TaskItemStyled prioties={prioties} theme={theme}>
             <h1>{title}</h1>
@@ -52,11 +52,25 @@ function TaskItem({ title, description, date, completed, id,prioties }: Props) {
                         Incomplete
                     </button>
                 )}
-                <button className="edit">{edit}</button>
+                <button
+                    className="edit"
+                    onClick={() =>
+                        openEditModal({
+                            id,
+                            title,
+                            description,
+                            date,
+                            completed,
+                            important: prioties,
+                        })
+                    }
+                >
+                    {edit}
+                </button>
                 <button
                     className="delete"
                     onClick={() => {
-                        deleteTask(params.username,id);
+                        deleteTask(params.username, id);
                     }}
                 >
                     {trash}
@@ -67,19 +81,19 @@ function TaskItem({ title, description, date, completed, id,prioties }: Props) {
 }
 
 const TaskItemStyled = styled.div<{ prioties: boolean }>`
-  padding: 1.2rem 1rem;
-  border-radius: 1rem;
-  background-color: ${(props) => props.theme.borderColor2};
-  box-shadow: ${(props) => props.theme.shadow7};
+    padding: 1.2rem 1rem;
+    border-radius: 1rem;
+    background-color: ${(props) => props.theme.borderColor2};
+    box-shadow: ${(props) => props.theme.shadow7};
     border: 2px solid ${(props) => (props.prioties ? props.theme.colorDanger : props.theme.borderColor2)};
-  height: 16rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+    height: 16rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 
-  .date {
-    margin-top: auto;
-  }
+    .date {
+        margin-top: auto;
+    }
 
   > h1 {
     font-size: 1.5rem;

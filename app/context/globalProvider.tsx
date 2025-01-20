@@ -116,7 +116,17 @@ export const GlobalProvider = ({ children }) => {
 
 // Pass this function to the Sidebar so it can call it when a category is clicked
 
+    const [editingTask, setEditingTask] = useState(null);  // New state for the task being edited
 
+    const openEditModal = (task) => {
+        setEditingTask(task);
+        openModal(); // Open the modal for editing
+    };
+
+    const closeEditModal = () => {
+        setEditingTask(null); // Clear the editing task when closing the modal
+        closeModal(); // Close the modal
+    };
     return (
         <GlobalContext.Provider
             value={{
@@ -137,7 +147,10 @@ export const GlobalProvider = ({ children }) => {
                 selectedCategory,  // Pass selectedCategory
                 switchCategory,
                 setSelectedTheme,
-                selectedTheme
+                selectedTheme,
+                openEditModal,  // New function to open modal for editing
+                closeEditModal, // New function to close edit modal
+                editingTask,
             }}
         >
             <GlobalUpdateContext.Provider value={{}}>

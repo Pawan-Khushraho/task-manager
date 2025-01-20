@@ -1,24 +1,32 @@
 "use client";
 import { useGlobalState } from "@/app/context/globalProvider";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import styled from "styled-components";
 import Button from "../Button";
 import { add, plus } from "@/app/utils/Icons";
-import {useParams} from "next/navigation";
+import { useParams } from "next/navigation";
 
 function CreateContent() {
     const params = useParams();
-
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [date, setDate] = useState("");
     const [completed, setCompleted] = useState(false);
     const [important, setImportant] = useState(false);
-
     // @ts-ignore
-    const { theme, allTasks, closeModal } = useGlobalState();
+    const { theme, allTasks, closeModal, editingTask, closeEditModal } = useGlobalState();
+
+    useEffect(() => {
+        if (editingTask) {
+            setTitle(editingTask.title);
+            setDescription(editingTask.description);
+            setDate(editingTask.date);
+            setCompleted(editingTask.completed);
+            setImportant(editingTask.important);
+        }
+    }, [editingTask]);
 
     const handleChange = (name: string) => (e: any) => {
         switch (name) {
@@ -58,23 +66,26 @@ function CreateContent() {
             const allUserTasks = JSON.parse(localStorage.getItem("userTasks") || "{}");
             const userTasks = allUserTasks[username] || [];
 
-            // Generate a unique ID and add creation timestamp
-            const newTask = {
-                ...task,
-                id: Date.now(),
-                createdAt: new Date().toISOString(),
-            };
+            if (editingTask) {
+                const updatedTasks = userTasks.map((existingTask) =>
+                    existingTask.id === editingTask.id ? { ...existingTask, ...task } : existingTask
+                );
 
-            userTasks.push(newTask);
+                allUserTasks[username] = updatedTasks;
+                localStorage.setItem("userTasks", JSON.stringify(allUserTasks));
 
-            // Save updated tasks for the user to localStorage
-            allUserTasks[username] = userTasks;
-            localStorage.setItem("userTasks", JSON.stringify(allUserTasks));
+                toast.success("Task updated successfully.");
+            } else {
+                const newTask = { ...task, id: Date.now(), createdAt: new Date().toISOString() };
+                userTasks.push(newTask);
+                allUserTasks[username] = userTasks;
+                localStorage.setItem("userTasks", JSON.stringify(allUserTasks));
 
-            toast.success("Task created successfully.");
+                toast.success("Task created successfully.");
+            }
 
-            // Refresh the task list and close the modal
             allTasks(username);
+            closeEditModal();
             closeModal();
         } catch (error) {
             toast.error("Something went wrong.");
@@ -86,7 +97,7 @@ function CreateContent() {
 
     return (
         <CreateContentStyled onSubmit={handleSubmit} theme={theme}>
-            <h1>Create a Task</h1>
+            <h1>{editingTask ? "Edit Task" : "Create Task"}</h1>
             <div className="input-control">
                 <label htmlFor="title">Title</label>
                 <input
@@ -120,7 +131,7 @@ function CreateContent() {
                 />
             </div>
             <div className="input-control toggler">
-                <label htmlFor="completed"> Completed</label>
+                <label htmlFor="completed">Completed</label>
                 <input
                     value={completed.toString()}
                     onChange={handleChange("completed")}
@@ -143,7 +154,7 @@ function CreateContent() {
             <div className="submit-btn flex justify-end">
                 <Button
                     type="submit"
-                    name="Create Task"
+                    name={editingTask ? "Save Changes" : "Create Task"}
                     icon={add}
                     padding={"0.8rem 2rem"}
                     borderRad={"0.8rem"}

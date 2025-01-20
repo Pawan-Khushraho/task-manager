@@ -17,7 +17,6 @@ const Page = () => {
         displayedTasks = incompleteTasks;
     }
 
-// Render the displayedTasks based on the selectedCategory
 
     return (
         <div>
